@@ -8,6 +8,7 @@
  * Resourceful controller for interacting with events
  */
 
+  const User = use('App/Models/User');
   const Event = use('App/Models/Event');
 
 class EventController {
@@ -21,12 +22,29 @@ class EventController {
    * @param {View} ctx.view
    */
   async index ({ request }) {
-    const events = Event.all();
+
+    const { latitude, longitude } = request.all()
+    const events = Event.query()
+      .nearBy(latitude, longitude, 10)
+      .fetch()
 
     return events;
   }
 
-  async store ({ request, response }) {
+  async store ({ auth, request }) {
+    const { id } = auth.user
+    const data = request.only([
+      'title',
+      "description",
+      'address',
+      'date',
+      'latitude',
+      'longitude',
+    ])
+
+    const event = await Event.create({ ...data, user_id: id })
+
+    return event;
   }
 
   /**
