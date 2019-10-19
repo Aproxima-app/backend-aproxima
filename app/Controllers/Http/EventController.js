@@ -22,13 +22,12 @@ class EventController {
    * @param {View} ctx.view
    */
   async index ({ request }) {
-
     const { latitude, longitude } = request.all()
+
     const events = Event.query()
+      .with('images')
       .nearBy(latitude, longitude, 10)
       .fetch()
-
-    return events;
   }
 
   async store ({ auth, request }) {
@@ -73,6 +72,22 @@ class EventController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
+    const event = await Event.findOrFail(params.id)
+
+    const data = request.only([
+      'title',
+      "description",
+      'address',
+      'date',
+      'latitude',
+      'longitude',
+    ])
+
+    event.merge(data)
+
+    await event.save()
+
+    return event
   }
 
   /**

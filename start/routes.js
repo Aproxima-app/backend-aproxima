@@ -22,3 +22,8 @@ Route.post('/sessions', "SessionController.store");
 Route.resource('events', 'EventController')
   .apiOnly()
   .middleware('auth')
+
+Route.post('events/:id/images', 'ImageController.store')
+  .middleware('auth')
+
+Route.get('images/:path', 'ImageController.show')
