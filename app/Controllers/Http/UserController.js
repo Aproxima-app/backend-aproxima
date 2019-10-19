@@ -1,14 +1,14 @@
-'use strict'
+"use strict"
 
-const User = require('../../Models/User');
+const User = use("App/Models/User")
 
 class UserController {
-  async store ({ request }) {
-    const data = request.all();
+  async create ({ request }) {
+    const data = request.only(["username", "email", "password"])
 
-    const user = User.create(data);
+    const user = await User.create(data)
 
-    return user;
+    return user
   }
 }
 

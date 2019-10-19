@@ -7,6 +7,9 @@
 /**
  * Resourceful controller for interacting with events
  */
+
+  const Event = use('App/Models/Event');
+
 class EventController {
   /**
    * Show a list of all events.
@@ -17,17 +20,12 @@ class EventController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index ({ request }) {
+    const events = Event.all();
+
+    return events;
   }
 
-  /**
-   * Create/save a new event.
-   * POST events
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async store ({ request, response }) {
   }
 
@@ -40,7 +38,12 @@ class EventController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show ({ params }) {
+    const event = await Event.findOrFail(params)
+
+    await event.load('images')
+
+    return event;
   }
 
   /**
@@ -62,7 +65,14 @@ class EventController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, auth, response }) {
+    const event = await Event.findOrFail(params.id)
+
+    if (event.user_id !== auth.user.id) {
+      return response.status(401).send({ error: 'Not authorized' })
+    }
+
+    await event.delete()
   }
 }
 
